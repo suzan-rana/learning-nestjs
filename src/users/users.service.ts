@@ -37,4 +37,8 @@ export class UsersService {
   deleteAllUsers() {
     return this.userRepository.clear();
   }
+
+  findUserByUsername(username: string) {
+    return this.userRepository.findBy({ username });
+  }
 }
