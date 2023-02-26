@@ -5,9 +5,7 @@ import { AuthService } from './auth.service';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    @Inject('AUTH_SERVICE') private readonly authService: AuthService,
-  ) {
+  constructor(private readonly authService: AuthService) {
     super();
   }
 
@@ -16,6 +14,10 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException();
     }
-    return user;
+    const newUser = {
+      ...user[0],
+      address: 'Nayamill',
+    };
+    return newUser;
   }
 }

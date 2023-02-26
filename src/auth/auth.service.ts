@@ -1,11 +1,14 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject('USER_SERVICE') private readonly userService: UsersService,
+    private readonly userService: UsersService,
+    private readonly jwtService: JwtService,
   ) {}
+
   async validateUser(username: string, password: string) {
     const UserDB = await this.userService.findUserByUsername(username);
     console.log('user database', UserDB);
@@ -14,5 +17,15 @@ export class AuthService {
     }
     if (UserDB[0]?.password === password) return UserDB;
     return null;
+  }
+
+  async login(username: string) {
+    //create a payload can be anything related to user like: userId, name,
+    const payload = {
+      username,
+    };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
   }
 }
