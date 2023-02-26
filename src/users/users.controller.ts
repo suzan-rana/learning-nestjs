@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { Body, UseGuards } from '@nestjs/common/decorators';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CreateUserDto } from './dto/CreateUser.dto';
 import { UsersService } from './users.service';
@@ -21,6 +22,7 @@ export class UsersController {
     return await this.userService.getAllUsers();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto) {
     return await this.userService.createUser(createUserDto);
