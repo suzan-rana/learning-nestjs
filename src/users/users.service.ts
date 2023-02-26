@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../typeorm/entities/User.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/CreateUser.dto';
+import { hashPassword } from 'src/utils/hashPassword';
 
 @Injectable()
 export class UsersService {
@@ -18,14 +19,24 @@ export class UsersService {
   }
 
   //creating a user
-  createUser(createUserDto: CreateUserDto) {
+  async createUser(createUserDto: CreateUserDto) {
     // creating the user not async
-    const newUser = this.userRepository.create({
-      ...createUserDto,
-      //   createdAt: Date.now(),
+    const userInDB = await this.userRepository.findBy({
+      username: createUserDto.username,
     });
-    //saving the user async methos
-    return this.userRepository.save(newUser);
+    console.log('user in data', userInDB);
+    if (userInDB.length !== 0) {
+      throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+    } else {
+      const hashedPassword = await hashPassword(createUserDto.password);
+      const newUser = this.userRepository.create({
+        ...createUserDto,
+        password: hashedPassword,
+        //   createdAt: Date.now(),
+      });
+      //saving the user async methos
+      return this.userRepository.save(newUser);
+    }
   }
 
   //deleteUser

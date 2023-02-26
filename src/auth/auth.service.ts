@@ -1,6 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { isPasswordSame } from 'src/utils/hashPassword';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +16,10 @@ export class AuthService {
     if (!UserDB) {
       throw new NotFoundException();
     }
-    if (UserDB[0]?.password === password) return UserDB;
+    // if (UserDB[0]?.password === password) return UserDB;
+    if (UserDB && isPasswordSame(UserDB[0]?.password, password)) {
+      return UserDB;
+    }
     return null;
   }
 
